@@ -29,10 +29,10 @@ Received from an OSC app/device at : <div id="status"></div>
 
 <hr />
 
-<script src="http://127.0.0.1:8081/socket.io/socket.io.js"></script>
+<script src="http://localhost:80/socket.io/socket.io.js"></script>
 
 <script>
-   var socket = io('http://127.0.0.1:8081');
+   var socket = io('http://localhost:80');
    socket.on('connect', function() {
         // sends to socket.io server the host/port of oscServer
         // and oscClient
