@@ -37,7 +37,8 @@ $(function() {
     //
 
     // create the socket to the local OSC server
-    var socket = new io.Socket("master--elaborate-faun-bfb800.netlify.app", { port: 80, rememberTransport: false });
+    // var socket = new io.Socket("master--elaborate-faun-bfb800.netlify.app", { port: 80, rememberTransport: false });
+    var socket = io('https://master--elaborate-faun-bfb800.netlify.app');
     
     // NOTE: we can create sockets to remote hosts too!!!
 
