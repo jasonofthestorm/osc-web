@@ -8,15 +8,16 @@ $(function() {
     $( "input:checkbox", ".tonematrix").button().click(function () {
         var id = $(this).attr('id');
         if ($(this).attr('checked')) {
-            socket.send({
-                address: '/lp/matrix',
-                message: [parseInt(id[1]), parseInt(id[2]), 1]
-            });
+            socket.emit('message', '/foo/bar 1 2 3');
+            //socket.send({
+            //    address: '/lp/matrix',
+            //    message: [parseInt(id[1]), parseInt(id[2]), 1]
+            //});
         } else {
-            socket.send({
-                address: '/lp/matrix',
-                message: [parseInt(id[1]), parseInt(id[2]), 0]
-            });
+            //socket.send({
+            //    address: '/lp/matrix',
+            //    message: [parseInt(id[1]), parseInt(id[2]), 0]
+            //});
         }
     });
     
@@ -36,7 +37,7 @@ $(function() {
     //
     
     // create the socket to the local OSC server
-    var socket = new io.Socket("localhost", { port: 3000, rememberTransport: false });
+    var socket = new io.Socket("master--elaborate-faun-bfb800.netlify.app", { port: 80, rememberTransport: false });
     
     // NOTE: we can create sockets to remote hosts too!!!
 
@@ -44,46 +45,49 @@ $(function() {
     socket.connect();
     
     // bind callbacks for each events.
-    socket.on('connect', function() {
-        notify('System Connected');
-        socket.send({
-            config: {
+   socket.on('connect', function() {
+        // sends to socket.io server the host/port of oscServer
+        // and oscClient
+        socket.emit('config',
+            {
                 server: {
-                    port: 11000,
-                    host: 'localhost'
+                    port: 3333,
+                    host: '127.0.0.1'
                 },
                 client: {
-                    port: 12000,
-                    host: 'localhost'
+                    port: 3334,
+                    host: '127.0.0.1'
                 }
             }
-        });
-        socket.send({
-            address: '/lp/matrix',
-            message: 'clear'
-        });
+        );
+    });
+
+    socket.on('message', function(obj) {
+        var status = document.getElementById("status");
+        status.innerHTML = obj[0];
+        console.log(obj);
     });
     
-    socket.on('message', function(obj) {
-        if ('OSCMessage' in obj) {
-            var msg = obj.OSCMessage;
-            notify('Incoming message: ' + "\n" +
-                   'address: '+ msg.address + "\n" +
-                   'args: ' + msg.args);
+    //socket.on('message', function(obj) {
+    //    if ('OSCMessage' in obj) {
+    //        var msg = obj.OSCMessage;
+    //        notify('Incoming message: ' + "\n" +
+    //               'address: '+ msg.address + "\n" +
+    //               'args: ' + msg.args);
             
-            switch (msg.address) {
-                case '/lp/matrix':
-                    $('#c' + msg.args[0].value + msg.args[1].value)
-                        .attr('checked', msg.args[2].value == 0 ? false : true);
-                    console.log($('#c' + msg.args[0].value + msg.args[1].value).attr('checked'));
-                    break;
-                default:
-                break;
-            }
-        } else if ('info' in obj) {
-            notify(obj.message);
-        }
-    });
+    //        switch (msg.address) {
+    //            case '/lp/matrix':
+    //                $('#c' + msg.args[0].value + msg.args[1].value)
+    //                    .attr('checked', msg.args[2].value == 0 ? false : true);
+    //                console.log($('#c' + msg.args[0].value + msg.args[1].value).attr('checked'));
+    //                break;
+    //            default:
+    //            break;
+    //        }
+    //    } else if ('info' in obj) {
+    //        notify(obj.message);
+    //    }
+    //});
     socket.on('disconnect', function() {
         notify('System Disconnected');
     });
